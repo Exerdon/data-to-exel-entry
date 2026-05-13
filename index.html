@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Cardholder Expense Submission Portal</title>
+
+   <link rel="stylesheet" type="text/css" href="sstyle.css">
+
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+
+    <h1>Cardholder Expense Submission Portal</h1>
+
+    <p>
+      Submit expense allocations and receipts.
+    </p>
+
+  </div>
+
+  <form id="expenseForm">
+
+    <div class="section-title">
+      Cardholder Information
+    </div>
+
+    <div class="grid">
+
+      <div class="field">
+
+        <label>Cardholder Name</label>
+
+        <input
+          type="text"
+          id="cardholderName"
+          list="cardholderSuggestions"
+          placeholder="Type or select cardholder"
+          required
+        />
+
+        <datalist id="cardholderSuggestions">
+
+          <option value="JEFFREY MARX">
+          <option value="DAWN CUPRYS">
+          <option value="AMY WILSON">
+
+
+        </datalist>
+
+      </div>
+
+      <div class="field">
+
+        <label>Submission Timestamp</label>
+
+        <input
+          type="date"
+          id="currentDate"
+          class="readonly"
+          readonly
+        />
+
+      </div>
+
+      <div class="field">
+
+        <label>Total Amount Spent</label>
+
+        <input
+          type="text"
+          id="totalAmount"
+          class="readonly"
+          readonly
+          value="0.00"
+        />
+
+      </div>
+
+    </div>
+
+    <div class="section-title">
+      Expense Entries
+    </div>
+
+    <table id="expenseTable">
+
+      <thead>
+
+        <tr>
+
+          <th>Date of Expense</th>
+
+          <th>Property</th>
+
+          <th>Ownership</th>
+
+          <th class="amount-column">Amount</th>
+
+          <th>Lot</th>
+
+          <th>Expense Type</th>
+
+          <th>Expense Description</th>
+
+          <th class="file-column">
+            Receipt Upload
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr>
+
+          <td>
+            <input type="date" class="expense-date" />
+          </td>
+
+          <td>
+            <textarea
+              rows="3"
+              placeholder="Property"
+            ></textarea>
+          </td>
+
+          <td>
+            <textarea
+              rows="3"
+              placeholder="Ownership"
+            ></textarea>
+          </td>
+
+          <td>
+            <input
+              type="number"
+              step="0.01"
+              class="amount-input"
+              placeholder="Amount"
+            />
+          </td>
+
+          <td>
+            <textarea
+              rows="3"
+              placeholder="Lot"
+            ></textarea>
+          </td>
+
+          <td>
+            <textarea
+              rows="3"
+              placeholder="Expense Type"
+            ></textarea>
+          </td>
+
+          <td>
+            <textarea
+              rows="3"
+              placeholder="Expense Description"
+            ></textarea>
+          </td>
+
+          <td>
+            <input
+              type="file"
+              class="receipt-file"
+              mULTIPLE
+            />
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+    <button
+      type="button"
+      class="add-btn"
+      onclick="addExpenseRow()"
+    >
+      + Add Expense Row
+    </button>
+
+    <button
+      type="submit"
+      class="submit-btn"
+    >
+      Submit Expense Report
+    </button>
+
+  </form>
+
+</div>
+
+<script>
+
+  // Auto-fill today's date
+  document.getElementById('currentDate').valueAsDate =
+    new Date();
+
+  // Calculate total amount
+  function calculateTotal(){
+
+    let total = 0;
+
+    document.querySelectorAll('.amount-input')
+      .forEach(input => {
+
+      total += parseFloat(input.value) || 0;
+
+    });
+
+    document.getElementById('totalAmount').value =
+      total.toFixed(2);
+
+  }
+
+  // Attach listeners
+  function attachAmountListeners(){
+
+    document.querySelectorAll('.amount-input')
+      .forEach(input => {
+
+      input.removeEventListener(
+        'input',
+        calculateTotal
+      );
+
+      input.addEventListener(
+        'input',
+        calculateTotal
+      );
+
+    });
+
+  }
+
+  // Add new expense row
+  function addExpenseRow(){
+
+    const tbody =
+      document.querySelector('#expenseTable tbody');
+
+    const row = tbody.insertRow();
+
+    row.innerHTML = `
+
+      <td>
+        <input type="date" class="expense-date" />
+      </td>
+
+      <td>
+        <textarea
+          rows="3"
+          placeholder="Property"
+        ></textarea>
+      </td>
+
+      <td>
+        <textarea
+          rows="3"
+          placeholder="Ownership"
+        ></textarea>
+      </td>
+
+      <td>
+        <input
+          type="number"
+          step="0.01"
+          class="amount-input"
+          placeholder="Amount"
+        />
+      </td>
+
+      <td>
+        <textarea
+          rows="3"
+          placeholder="Lot"
+        ></textarea>
+      </td>
+
+      <td>
+        <textarea
+          rows="3"
+          placeholder="Expense Type"
+        ></textarea>
+      </td>
+
+      <td>
+        <textarea
+          rows="3"
+          placeholder="Expense Description"
+        ></textarea>
+      </td>
+
+      <td>
+        <input
+          type="file"
+          class="receipt-file"
+        />
+      </td>
+
+    `;
+
+    attachAmountListeners();
+
+  }
+
+  attachAmountListeners();
+
+  // Submit form
+  document.getElementById('expenseForm')
+    .addEventListener('submit', function(e){
+
+    e.preventDefault();
+
+    const cardholder =
+      document.getElementById('cardholderName')
+      .value
+      .trim();
+
+    if(!cardholder){
+
+      alert('Please enter cardholder name.');
+
+      return;
+
+    }
+
+    const timestamp =
+      document.getElementById('currentDate')
+      .value;
+
+    const totalAmount =
+      document.getElementById('totalAmount')
+      .value;
+
+    const rows =
+      document.querySelectorAll(
+        '#expenseTable tbody tr'
+      );
+
+    let csvRows = [];
+
+    const headers = [
+
+      'Sr No',
+      'Cardholder',
+      'Submission Timestamp',
+      'Expense Date',
+      'Property',
+      'Ownership',
+      'Amount',
+      'Lot',
+      'Expense Type',
+      'Expense Description',
+      'Receipt File Name'
+
+    ];
+
+    csvRows.push(headers.join(','));
+
+    rows.forEach((row,index) => {
+
+      const expenseDate =
+        row.querySelector('.expense-date')
+        .value;
+
+      const textareas =
+        row.querySelectorAll('textarea');
+
+      const property =
+        textareas[0].value;
+
+      const ownership =
+        textareas[1].value;
+
+      const amount =
+        row.querySelector('.amount-input')
+        .value;
+
+      const lot =
+        "'" + (textareas[2].value || '');
+
+      const expenseType =
+        textareas[3].value;
+
+      const expenseDescription =
+        textareas[4].value;
+
+      const receiptInput =
+        row.querySelector('.receipt-file');
+
+      let receiptFileName = '';
+
+      // Rename and download receipts
+if(receiptInput.files.length > 0){
+
+  let receiptNames = [];
+
+  Array.from(receiptInput.files).forEach((file,fileIndex) => {
+
+    const extension =
+      file.name.split('.').pop();
+
+    const cleanCardholder =
+      cardholder.replace(/\s+/g,'');
+
+    const generatedName =
+      `${index + 1}.${fileIndex + 1}-${cleanCardholder}-${expenseDate}_${amount}.${extension}`;
+
+    receiptNames.push(generatedName);
+
+    const link =
+      document.createElement('a');
+
+    link.href =
+      URL.createObjectURL(file);
+
+    link.download =
+      generatedName;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+  });
+
+  receiptFileName = receiptNames.join(' | ');
+
+}
+
+      const csvLine = [
+
+        index + 1,
+
+        `"${cardholder}"`,
+
+        `"${timestamp}"`,
+
+        `"${expenseDate}"`,
+
+        `"${property.replace(/\n/g,' ')}"`,
+
+        `"${ownership.replace(/\n/g,' ')}"`,
+
+        `"'${amount}"`,
+
+        `"${lot.replace(/\n/g,' ')}"`,
+
+        `"${expenseType.replace(/\n/g,' ')}"`,
+
+        `"${expenseDescription.replace(/\n/g,' ')}"`,
+
+        `"${receiptFileName}"`
+
+      ];
+
+      csvRows.push(csvLine.join(','));
+
+    });
+
+    // Generate CSV
+    const csvContent =
+      csvRows.join('\n');
+
+    const blob =
+      new Blob(
+        [csvContent],
+        {
+          type:'text/csv;charset=utf-8;'
+        }
+      );
+
+    const csvLink =
+      document.createElement('a');
+
+    csvLink.href =
+      URL.createObjectURL(blob);
+
+    const cleanCardholder =
+      cardholder.replace(/\s+/g,'');
+
+    csvLink.download =
+      `${cleanCardholder}-${timestamp}-${totalAmount}.csv`;
+
+    document.body.appendChild(csvLink);
+
+    csvLink.click();
+
+    document.body.removeChild(csvLink);
+
+    alert(
+      'Expense report exported successfully.'
+    );
+
+    location.reload();
+
+  });
+
+</script>
+
+</body>
+
+</html>
